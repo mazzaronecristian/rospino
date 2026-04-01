@@ -5,7 +5,6 @@ import org.oristool.models.stpn.trees.StochasticTransitionFeature;
 import java.math.BigDecimal;
 
 public class Delay {
-    private static final BigDecimal PSEUDO_INFINITY = new BigDecimal("1E+999999999");
     private final BigDecimal eft;
     private final BigDecimal lft;
 
@@ -14,11 +13,25 @@ public class Delay {
         this.lft = lft;
     }
 
-    public static BigDecimal getInfiniteDelay() {
-        return PSEUDO_INFINITY;
+    public Delay(double eft, double lft){
+        this.eft = BigDecimal.valueOf(eft);
+        this.lft = BigDecimal.valueOf(lft);
+    }
+
+    public BigDecimal getEft() {
+        return eft;
+    }
+
+    public BigDecimal getLft() {
+        return lft;
+    }
+
+    public static Delay getInfiniteDelay() {
+        return new Delay(BigDecimal.valueOf(Double.MAX_VALUE), BigDecimal.valueOf(Double.MAX_VALUE));
     }
 
     public StochasticTransitionFeature toUniformInstance() {
         return StochasticTransitionFeature.newUniformInstance(eft, lft);
     }
+
 }

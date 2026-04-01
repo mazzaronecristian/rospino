@@ -1,20 +1,34 @@
 package org.oristool.rospino.computingNodes;
 
-public class Node {
-    private int capacity;
-    private int id;
+import org.oristool.rospino.placement.Service;
 
-    public Node(int capacity, int id) {
-        this.capacity = capacity;
+public class Node {
+    private int id;
+    private double totalCores;
+    private double availableCores;
+
+
+    public double getAvailableCores() {
+        return availableCores;
+    }
+
+    public void setAvailableCores(double availableCores) {
+        this.availableCores = availableCores;
+    }
+
+    public Node(int id, double totalCores) {
+        this.totalCores = totalCores;
+        this.availableCores = totalCores;
         this.id = id;
     }
 
-    public int getCapacity() {
-        return capacity;
+
+    public double getTotalCores() {
+        return totalCores;
     }
 
-    public Node setCapacity(int capacity) {
-        this.capacity = capacity;
+    public Node setTotalCores(double totalCores) {
+        this.totalCores = totalCores;
         return this;
     }
 
@@ -26,6 +40,19 @@ public class Node {
         this.id = id;
         return this;
     }
+
+
+    public boolean canHost(Service a) {
+        return availableCores >= a.getDemand();
+    }
+
+    public void allocate(Service a) {
+        if (!canHost(a))
+            throw new IllegalStateException(
+                    "Nodo " + id + " senza capacità per " + a.getId());
+        availableCores -= a.getDemand();
+    }
+
 
     @Override
     public boolean equals(Object obj) {
