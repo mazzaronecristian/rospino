@@ -48,8 +48,6 @@ public class DeploymentPlanner {
      */
     public Map<String, Node> place(List<Service> services) {
         List<Service> sorted = topologicalSort(services);
-        Map<String, Service> byId = new HashMap<>();
-        for (Service s : services) byId.put(s.getId(), s);
 
         for (Service service : sorted) {
             Node best = null;
@@ -85,14 +83,12 @@ public class DeploymentPlanner {
     private BigDecimal delayCost(Service service, Node candidate) {
         List<String> preds = predecessors.getOrDefault(service.getId(), List.of());
         BigDecimal cost = BigDecimal.valueOf(0.0);
-        int candIdx = nodeIndex.get(candidate.getId());
 
         for (String predId : preds) {
             Node predNode = assignment.get(predId);
             if (predNode == null) continue;
-            int predIdx = nodeIndex.get(predNode.getId());
             Delay delayBetweenNodes = networkGraph.getDelayBetweenNodes(predNode, candidate);
-            cost.add(delayBetweenNodes.getLft());
+            cost = cost.add(delayBetweenNodes.getLft());
         }
         return cost;
     }
@@ -104,8 +100,9 @@ public class DeploymentPlanner {
 
         Map<String, Integer> inDegree = new HashMap<>();
         for (Service s : services) inDegree.put(s.getId(), 0);
-        for (String id : predecessors.keySet())
-            inDegree.put(id, predecessors.get(id).size());
+        for (Map.Entry<String, List<String>> stringListEntry : predecessors.entrySet()) {
+            inDegree.put(stringListEntry.getKey(), stringListEntry.getValue().size());
+        }
 
         Queue<String> queue = new ArrayDeque<>();
         for (Map.Entry<String, Integer> e : inDegree.entrySet())
@@ -131,10 +128,10 @@ public class DeploymentPlanner {
         BigDecimal total = BigDecimal.valueOf(0.0);
         for (Service s : services)
             total = total.add(BigDecimal.valueOf(s.responseTime()));
-        for (String serviceId : predecessors.keySet()) {
-            Node toNode = assignment.get(serviceId);
+        for (Map.Entry<String, List<String>> stringListEntry : predecessors.entrySet()) {
+            Node toNode = assignment.get(stringListEntry.getKey());
             if (toNode == null) continue;
-            for (String predId : predecessors.get(serviceId)) {
+            for (String predId : stringListEntry.getValue()) {
                 Node fromNode = assignment.get(predId);
                 if (fromNode == null) continue;
                 Delay delayBetweenNodes = networkGraph.getDelayBetweenNodes(fromNode, toNode);
