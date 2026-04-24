@@ -21,14 +21,14 @@ import static org.oristool.models.stpn.trees.StochasticTransitionFeature.newUnif
 public class Main {
     public static void main(String[] args) {
         // Rete: 2 nodi, ciascuno con 4 core
-        Node n1 = new Node(1, 8);
+        Node n1 = new Node(1, 5);
         Node n2 = new Node(2, 4);
-        Node n3 = new Node(3, 4);
+        Node n3 = new Node(3, 0);
 
         WeightedGraph<Node, Delay> weightedGraph = new WeightedGraph<>();
-        weightedGraph.addNode(n1);
-        weightedGraph.addNode(n2);
-        weightedGraph.addNode(n3);
+        weightedGraph.addNode(n1,new Delay(0,0));
+        weightedGraph.addNode(n2,new Delay(0,0));
+        weightedGraph.addNode(n3,new Delay(0,0));
         weightedGraph.addEdge(n1, n2, new Delay(1,5));
         weightedGraph.addEdge(n1, n3, new Delay(1,5));
         weightedGraph.addEdge(n2, n3, new Delay(1,5));

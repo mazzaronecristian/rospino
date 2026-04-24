@@ -27,8 +27,11 @@ public class WeightedGraph<T, K> {
      *
      * @param id identificativo del nodo
      */
-    public void addNode(T id) {
-        adjacency.putIfAbsent(id, new ArrayList<>());
+    public void addNode(T id, K selfLoopWeight) {
+        if (adjacency.get(id) == null) {
+            adjacency.put(id, new ArrayList<>());
+            this.addEdge(id, id, selfLoopWeight);
+        }
     }
 
     /**
@@ -78,10 +81,11 @@ public class WeightedGraph<T, K> {
         if (weight == null) {
             throw new IllegalArgumentException("Non puoi impostare un peso a null!");
         }
-        addNode(from);
-        addNode(to);
-        setEdgeInList(adjacency.get(from), from, to, weight);
-        setEdgeInList(adjacency.get(to), to, from, weight);
+        if (hasNode(from) && hasNode(to)) {
+            setEdgeInList(adjacency.get(from), from, to, weight);
+            setEdgeInList(adjacency.get(to), to, from, weight);
+        }
+        // TODO aggiungere addNode se i nodi non sono presenti nel grafo
     }
 
     /**

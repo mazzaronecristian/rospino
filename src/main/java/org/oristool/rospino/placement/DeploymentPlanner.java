@@ -44,10 +44,10 @@ public class DeploymentPlanner {
         for (Service service : sorted) {
             Node best = null;
             BigDecimal bestCost = BigDecimal.valueOf(Double.MAX_VALUE);
-
-            for (Node candidate : networkGraph.getNodes()) {
+            Set<Node> nodes = networkGraph.getNodes();
+            Comparator<Node> byAvailableCores = Comparator.comparingDouble(Node::getAvailableCores);
+            for (Node candidate : nodes.stream().sorted(byAvailableCores).toList()) {
                 if (!candidate.canHost(service)) continue;
-
                 BigDecimal cost = delayCost(service, candidate);
                 if (cost.compareTo(bestCost) < 0) {
                     bestCost = cost;
