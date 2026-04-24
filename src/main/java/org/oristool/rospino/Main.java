@@ -5,13 +5,11 @@ import org.oristool.eulero.modeling.deprecated.Activity;
 import org.oristool.eulero.modeling.deprecated.Simple;
 import org.oristool.eulero.modeling.deprecated.DAG;
 import org.oristool.eulero.modeling.deprecated.XOR;
-import org.oristool.eulero.modeling.stochastictime.StochasticTime;
-import org.oristool.eulero.modeling.stochastictime.UniformTime;
 import org.oristool.models.stpn.trees.StochasticTransitionFeature;
 import org.oristool.rospino.computingNodes.Delay;
 import org.oristool.rospino.computingNodes.Node;
 import org.oristool.rospino.computingNodes.WeightedGraph;
-import org.oristool.rospino.placement.DeploymentPlanner;
+import org.oristool.rospino.placement.DeploymentManager;
 import org.oristool.rospino.placement.Service;
 
 import java.util.*;
@@ -21,9 +19,9 @@ import static org.oristool.models.stpn.trees.StochasticTransitionFeature.newUnif
 public class Main {
     public static void main(String[] args) {
         // Rete: 2 nodi, ciascuno con 4 core
-        Node n1 = new Node(1, 5);
+        Node n1 = new Node(1, 4);
         Node n2 = new Node(2, 4);
-        Node n3 = new Node(3, 0);
+        Node n3 = new Node(3, 4);
 
         WeightedGraph<Node, Delay> weightedGraph = new WeightedGraph<>();
         weightedGraph.addNode(n1,new Delay(0,0));
@@ -105,7 +103,7 @@ public class Main {
         List<Service> services = List.of(sA, sB, sC);
 
 
-        DeploymentPlanner planner = new DeploymentPlanner(weightedGraph);
+        DeploymentManager planner = new DeploymentManager(weightedGraph);
         // DAG: A → B → C
         sB.addPredecessors(sA);
         sC.addPredecessors(sB);

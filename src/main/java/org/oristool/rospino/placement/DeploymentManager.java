@@ -8,29 +8,17 @@ import org.oristool.rospino.computingNodes.WeightedGraph;
 import java.math.BigDecimal;
 import java.util.*;
 
-public class DeploymentPlanner {
+public class DeploymentManager {
     private final NetworkGraph networkGraph;
+
     /**
-     * Matrice di delay: delay[i][j] = ritardo tra nodo i e nodo j.
-     * delay[i][i] = 0 (stesso nodo, nessun ritardo).
-     * I nodi sono indicizzati nell'ordine della lista nodes.
+     * Mappa con come chiave i servizi e come valori i nodi a cui il servizio è assegnato
      */
-    private final Map<Integer, Integer> nodeIndex;
+    private final Map<Service, Node> assignments;
 
-    // Grafo delle dipendenze tra servizi: edges(a) = predecessori di a
-    private final Map<String, List<String>> predecessors;
-
-    // Risultato del placement: servizio → nodo
-    private final Map<Service, Node> assignment;
-
-    public DeploymentPlanner(WeightedGraph<Node, Delay> weightedGraph) {
-        this.nodeIndex = new HashMap<>();
-        this.predecessors = new HashMap<>();
-        this.assignment = new HashMap<>();
+    public DeploymentManager(WeightedGraph<Node, Delay> weightedGraph) {
+        this.assignments = new HashMap<>();
         this.networkGraph = new NetworkGraph(weightedGraph);
-        List<Node> nodes = networkGraph.getNodes().stream().toList();
-        for (int i = 0; i < nodes.size(); i++)
-            nodeIndex.put(nodes.get(i).getId(), i);
     }
 
     /**
@@ -60,10 +48,10 @@ public class DeploymentPlanner {
                         "Placement impossibile per il servizio: " + service.getId());
 
             best.allocate(service);
-            assignment.put(service, best);
+            assignments.put(service, best);
         }
 
-        return Collections.unmodifiableMap(assignment);
+        return Collections.unmodifiableMap(assignments);
     }
 
     /**
@@ -77,7 +65,7 @@ public class DeploymentPlanner {
         BigDecimal cost = BigDecimal.valueOf(0.0);
 
         for (Service predecessor : predecessors) {
-            Node predNode = assignment.get(predecessor);
+            Node predNode = assignments.get(predecessor);
             if (predNode == null) continue;
             Delay delayBetweenNodes = networkGraph.getDelayBetweenNodes(predNode, candidate);
             cost = cost.add(delayBetweenNodes.getLft());
@@ -98,7 +86,7 @@ public class DeploymentPlanner {
         Map<Service, List<Service>> successorsPerService = new HashMap<>();
         for (Service service : services) {
             for (Service predecessor : service.getPredecessors()) {
-                successorsPerService.computeIfAbsent(predecessor, s -> new ArrayList<>()).add(service);
+                successorsPerService.computeIfAbsent(predecessor, _ -> new ArrayList<>()).add(service);
             }
 
         }
@@ -125,13 +113,12 @@ public class DeploymentPlanner {
     /** Costo totale del placement corrente (per valutazione/debug). */
     public BigDecimal totalCost(List<Service> services) {
         BigDecimal total = BigDecimal.valueOf(0.0);
-        for (Service s : services)
-            total = total.add(BigDecimal.valueOf(s.responseTime()));
-        for (Map.Entry<String, List<String>> stringListEntry : predecessors.entrySet()) {
-            Node toNode = assignment.get(stringListEntry.getKey());
+        for (Service service : services) {
+            total = total.add(BigDecimal.valueOf(service.responseTime()));
+            Node toNode = assignments.get(service);
             if (toNode == null) continue;
-            for (String predId : stringListEntry.getValue()) {
-                Node fromNode = assignment.get(predId);
+            for (Service predecessor : service.getPredecessors()) {
+                Node fromNode = assignments.get(predecessor);
                 if (fromNode == null) continue;
                 Delay delayBetweenNodes = networkGraph.getDelayBetweenNodes(fromNode, toNode);
                 total = total.add(delayBetweenNodes.getLft());
