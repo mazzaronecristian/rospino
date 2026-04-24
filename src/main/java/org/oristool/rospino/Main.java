@@ -21,9 +21,8 @@ import static org.oristool.models.stpn.trees.StochasticTransitionFeature.newUnif
 public class Main {
     public static void main(String[] args) {
         // Rete: 2 nodi, ciascuno con 4 core
-        Node n1 = new Node(1, 4);
+        Node n1 = new Node(1, 8);
         Node n2 = new Node(2, 4);
-
         Node n3 = new Node(3, 4);
 
         WeightedGraph<Node, Delay> weightedGraph = new WeightedGraph<>();
@@ -100,18 +99,18 @@ public class Main {
         top.setActivities ( Lists. newArrayList (Q , R , S , T ) ) ;
 
 
-        Service sA = new Service(top, 4, 2, 2, "1");
-        Service sB = new Service(top, 3,  1, 1, "2");
-        Service sC = new Service(top, 2,  3, 2, "3");
+        Service sA = new Service(top, 4, 2, 2, "A");
+        Service sB = new Service(top, 3,  1, 1, "B");
+        Service sC = new Service(top, 2,  3, 2, "C");
         List<Service> services = List.of(sA, sB, sC);
 
 
         DeploymentPlanner planner = new DeploymentPlanner(weightedGraph);
         // DAG: A → B → C
-        planner.addDependency("A", "B");
-        planner.addDependency("B", "C");
+        sB.addPredecessors(sA);
+        sC.addPredecessors(sB);
 
-        Map<String, Node> result = planner.place(services);
+        Map<Service, Node> result = planner.place(services);
         result.forEach((svc, node) ->
                 System.out.println("Servizio " + svc + " → " + node.getId()));
 
