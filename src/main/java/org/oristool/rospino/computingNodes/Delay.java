@@ -13,9 +13,17 @@ public class Delay {
         this.lft = lft;
     }
 
-    public Delay(double eft, double lft){
+    public Delay(double eft, double lft) {
         this.eft = BigDecimal.valueOf(eft);
         this.lft = BigDecimal.valueOf(lft);
+    }
+
+    public static Delay getInfiniteDelay() {
+        return new Delay(BigDecimal.valueOf(Double.MAX_VALUE), BigDecimal.valueOf(Double.MAX_VALUE));
+    }
+
+    public static Delay getZero() {
+        return new Delay(0, 0);
     }
 
     public BigDecimal getEft() {
@@ -24,10 +32,6 @@ public class Delay {
 
     public BigDecimal getLft() {
         return lft;
-    }
-
-    public static Delay getInfiniteDelay() {
-        return new Delay(BigDecimal.valueOf(Double.MAX_VALUE), BigDecimal.valueOf(Double.MAX_VALUE));
     }
 
     public StochasticTransitionFeature toUniformInstance() {

@@ -27,9 +27,9 @@ public class Main {
         Node n3 = new Node(3, 4);
 
         StronglyConnectedWeightedGraph<Node, Delay> stronglyConnectedWeightedGraph = new StronglyConnectedWeightedGraph<>();
-        stronglyConnectedWeightedGraph.addNode(n1,new Delay(0,0));
-        stronglyConnectedWeightedGraph.addNode(n2,new Delay(0,0));
-        stronglyConnectedWeightedGraph.addNode(n3,new Delay(0,0));
+        stronglyConnectedWeightedGraph.addNode(n1,Delay.getZero());
+        stronglyConnectedWeightedGraph.addNode(n2,Delay.getZero());
+        stronglyConnectedWeightedGraph.addNode(n3,Delay.getZero());
         stronglyConnectedWeightedGraph.addEdge(n1, n2, new Delay(1,5));
         stronglyConnectedWeightedGraph.addEdge(n1, n3, new Delay(1,5));
         stronglyConnectedWeightedGraph.addEdge(n2, n3, new Delay(1,5));

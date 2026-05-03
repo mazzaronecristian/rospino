@@ -64,7 +64,7 @@ class StronglyConnectedWeightedGraphTest {
         @Test
         @DisplayName("addNode aggiunge il nodo")
         void addNodeInsertsNode() {
-            g.addNode("X");
+            g.addNode("X", (double) 0);
             assertTrue(g.hasNode("X"));
             assertEquals(1, g.nodeCount());
         }
@@ -72,8 +72,8 @@ class StronglyConnectedWeightedGraphTest {
         @Test
         @DisplayName("addNode è idempotente")
         void addNodeIdempotent() {
-            g.addNode("X");
-            g.addNode("X");
+            g.addNode("X", (double) 0);
+            g.addNode("X", (double) 0);
             assertEquals(1, g.nodeCount());
         }
 
@@ -86,7 +86,7 @@ class StronglyConnectedWeightedGraphTest {
         @Test
         @DisplayName("removeNode elimina il nodo")
         void removeNodeDeletesNode() {
-            g.addNode("A");
+            g.addNode("A", (double) 0);
             g.removeNode("A");
             assertFalse(g.hasNode("A"));
             assertEquals(0, g.nodeCount());
@@ -114,16 +114,16 @@ class StronglyConnectedWeightedGraphTest {
         @Test
         @DisplayName("nodes() restituisce tutti i nodi presenti")
         void nodesReturnsAllNodes() {
-            g.addNode("A");
-            g.addNode("B");
-            g.addNode("C");
+            g.addNode("A", (double) 0 );
+            g.addNode("B", (double) 0 );
+            g.addNode("C", (double) 0 );
             assertEquals(Set.of("A", "B", "C"), g.nodes());
         }
 
         @Test
         @DisplayName("nodes() è una vista non modificabile")
         void nodesViewIsUnmodifiable() {
-            g.addNode("A");
+            g.addNode("A", (double) 0);
             Set<String> view = g.nodes();
             assertThrows(UnsupportedOperationException.class, () -> view.add("X"));
         }
@@ -132,7 +132,7 @@ class StronglyConnectedWeightedGraphTest {
         @DisplayName("addNode con tipo Integer")
         void addNodeWithIntegerType() {
             StronglyConnectedWeightedGraph<Integer, Double> gi = new StronglyConnectedWeightedGraph<>();
-            gi.addNode(42);
+            gi.addNode(42, (double) 0);
             assertTrue(gi.hasNode(42));
         }
     }
@@ -164,15 +164,15 @@ class StronglyConnectedWeightedGraphTest {
         @Test
         @DisplayName("hasEdge restituisce false per arco inesistente")
         void hasEdgeUnknown() {
-            g.addNode("A");
-            g.addNode("B");
+            g.addNode("A", (double) 0);
+            g.addNode("B", (double) 0);
             assertFalse(g.hasEdge("A", "B"));
         }
 
         @Test
         @DisplayName("hasEdge restituisce false se il nodo sorgente non esiste")
         void hasEdgeUnknownSourceNode() {
-            g.addNode("B");
+            g.addNode("B", (double) 0);
             assertFalse(g.hasEdge("X", "B"));
         }
 
@@ -196,8 +196,8 @@ class StronglyConnectedWeightedGraphTest {
         @Test
         @DisplayName("getWeight restituisce empty per arco inesistente")
         void getWeightMissingEdge() {
-            g.addNode("A");
-            g.addNode("B");
+            g.addNode("A", (double) 0 );
+            g.addNode("B", (double) 0 );
             assertTrue(g.getWeight("A", "B").isEmpty());
         }
 
@@ -251,8 +251,8 @@ class StronglyConnectedWeightedGraphTest {
         @Test
         @DisplayName("removeEdge restituisce false se l'arco non esiste")
         void removeEdgeMissing() {
-            g.addNode("A");
-            g.addNode("B");
+            g.addNode("A", (double) 0 );
+            g.addNode("B", (double) 0 );
             assertFalse(g.removeEdge("A", "B"));
         }
 
@@ -268,7 +268,7 @@ class StronglyConnectedWeightedGraphTest {
         @Test
         @DisplayName("removeEdge con nodo sorgente inesistente restituisce false")
         void removeEdgeMissingSourceNode() {
-            g.addNode("B");
+            g.addNode("B", (double) 0);
             assertFalse(g.removeEdge("X", "B"));
         }
 
@@ -307,8 +307,8 @@ class StronglyConnectedWeightedGraphTest {
         @Test
         @DisplayName("nodeCount è corretto dopo inserimenti e rimozioni")
         void nodeCountAfterMutations() {
-            g.addNode("A");
-            g.addNode("B");
+            g.addNode("A", (double) 0);
+            g.addNode("B", (double) 0);
             assertEquals(2, g.nodeCount());
             g.removeNode("A");
             assertEquals(1, g.nodeCount());
@@ -340,7 +340,7 @@ class StronglyConnectedWeightedGraphTest {
         @Test
         @DisplayName("degree di nodo isolato è 0")
         void degreeIsolatedNode() {
-            g.addNode("X");
+            g.addNode("X", (double) 0);
             assertEquals(0, g.degree("X"));
         }
 
@@ -362,7 +362,7 @@ class StronglyConnectedWeightedGraphTest {
         @Test
         @DisplayName("BFS su grafo con un solo nodo restituisce solo quel nodo")
         void bfsSingleNode() {
-            g.addNode("A");
+            g.addNode("A", (double) 0);
             assertEquals(List.of("A"), g.bfs("A"));
         }
 
@@ -386,7 +386,7 @@ class StronglyConnectedWeightedGraphTest {
         @DisplayName("BFS non visita nodi irraggiungibili")
         void bfsDisconnectedComponent() {
             g.addEdge("A", "B", 1.0);
-            g.addNode("C"); // componente isolata
+            g.addNode("C", (double) 0); // componente isolata
             List<String> result = g.bfs("A");
             assertEquals(2, result.size());
             assertFalse(result.contains("C"));
@@ -420,7 +420,7 @@ class StronglyConnectedWeightedGraphTest {
         @Test
         @DisplayName("DFS su grafo con un solo nodo restituisce solo quel nodo")
         void dfsSingleNode() {
-            g.addNode("A");
+            g.addNode("A", (double) 0);
             assertEquals(List.of("A"), g.dfs("A"));
         }
 
@@ -444,7 +444,7 @@ class StronglyConnectedWeightedGraphTest {
         @DisplayName("DFS non visita nodi irraggiungibili")
         void dfsDisconnectedComponent() {
             g.addEdge("A", "B", 1.0);
-            g.addNode("C");
+            g.addNode("C", (double) 0);
             List<String> result = g.dfs("A");
             assertEquals(2, result.size());
             assertFalse(result.contains("C"));
