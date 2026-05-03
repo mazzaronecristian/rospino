@@ -3,32 +3,30 @@ package org.oristool.rospino.placement;
 import org.oristool.rospino.computingNodes.Delay;
 import org.oristool.rospino.computingNodes.NetworkGraph;
 import org.oristool.rospino.computingNodes.Node;
-import org.oristool.rospino.computingNodes.WeightedGraph;
 
 import java.math.BigDecimal;
 import java.util.*;
 
-public class DeploymentManager {
-    private final NetworkGraph networkGraph;
+public class DeploymentManager implements IDeploymentManager {
+    private static DeploymentManager instance;
 
-    /**
-     * Mappa con come chiave i servizi e come valori i nodi a cui il servizio è assegnato
-     */
-    private final Map<Service, Node> assignments;
-
-    public DeploymentManager(WeightedGraph<Node, Delay> weightedGraph) {
-        this.assignments = new HashMap<>();
-        this.networkGraph = new NetworkGraph(weightedGraph);
+    public static synchronized DeploymentManager getInstance() {
+        if (instance == null) {
+            instance = new DeploymentManager();
+        }
+        return instance;
     }
 
     /**
      * Esegue il placement greedy.
      * Per ogni servizio (in ordine topologico) sceglie il nodo che minimizza
-     * la somma dei delay verso i predecessori già piazzati.
+     * la somma dei delay verso i predecessori già piazzati, prediligendo i nodi con meno cpu libere.
+     * Si prediligono i nodi con cpu libere in quanto un servizi non è divisibile su più nodi; quindi se su un nodi rimangono meno cpu è più probabile che non verranno utilizzate
      */
-    public Map<Service, Node> place(List<Service> services) {
+    @Override
+    public DeploymentPlan place(NetworkGraph networkGraph, List<Service> services) {
         List<Service> sorted = topologicalSort(services);
-
+        Map<Service, Node> assignments = new HashMap<>();
         for (Service service : sorted) {
             Node best = null;
             BigDecimal bestCost = BigDecimal.valueOf(Double.MAX_VALUE);
@@ -36,7 +34,7 @@ public class DeploymentManager {
             Comparator<Node> byAvailableCores = Comparator.comparingDouble(Node::getAvailableCores);
             for (Node candidate : nodes.stream().sorted(byAvailableCores).toList()) {
                 if (!candidate.canHost(service)) continue;
-                BigDecimal cost = delayCost(service, candidate);
+                BigDecimal cost = delayCost(service, assignments, networkGraph, candidate);
                 if (cost.compareTo(bestCost) < 0) {
                     bestCost = cost;
                     best = candidate;
@@ -51,7 +49,7 @@ public class DeploymentManager {
             assignments.put(service, best);
         }
 
-        return Collections.unmodifiableMap(assignments);
+        return new DeploymentPlan(assignments, networkGraph);
     }
 
     /**
@@ -60,7 +58,7 @@ public class DeploymentManager {
      * Se un predecessore non è ancora piazzato (non dovrebbe accadere con
      * ordine topologico), il suo contributo è 0.
      */
-    private BigDecimal delayCost(Service service, Node candidate) {
+    private BigDecimal delayCost(Service service, Map<Service, Node> assignments, NetworkGraph networkGraph, Node candidate) {
         Set<Service> predecessors = service.getPredecessors();
         BigDecimal cost = BigDecimal.valueOf(0.0);
 
@@ -73,7 +71,9 @@ public class DeploymentManager {
         return cost;
     }
 
-    /** Kahn's algorithm per il topological sort. */
+    /**
+     * Kahn's algorithm per il topological sort.
+     */
     private List<Service> topologicalSort(List<Service> services) {
 
         Map<Service, Integer> inDegree = new HashMap<>();
@@ -110,20 +110,4 @@ public class DeploymentManager {
         return result;
     }
 
-    /** Costo totale del placement corrente (per valutazione/debug). */
-    public BigDecimal totalCost(List<Service> services) {
-        BigDecimal total = BigDecimal.valueOf(0.0);
-        for (Service service : services) {
-            total = total.add(BigDecimal.valueOf(service.responseTime()));
-            Node toNode = assignments.get(service);
-            if (toNode == null) continue;
-            for (Service predecessor : service.getPredecessors()) {
-                Node fromNode = assignments.get(predecessor);
-                if (fromNode == null) continue;
-                Delay delayBetweenNodes = networkGraph.getDelayBetweenNodes(fromNode, toNode);
-                total = total.add(delayBetweenNodes.getLft());
-            }
-        }
-        return total;
-    }
 }

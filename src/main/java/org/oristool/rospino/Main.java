@@ -2,38 +2,42 @@ package org.oristool.rospino;
 
 import com.google.common.collect.Lists;
 import org.oristool.eulero.modeling.deprecated.Activity;
-import org.oristool.eulero.modeling.deprecated.Simple;
 import org.oristool.eulero.modeling.deprecated.DAG;
+import org.oristool.eulero.modeling.deprecated.Simple;
 import org.oristool.eulero.modeling.deprecated.XOR;
 import org.oristool.models.stpn.trees.StochasticTransitionFeature;
 import org.oristool.rospino.computingNodes.Delay;
+import org.oristool.rospino.computingNodes.NetworkGraph;
 import org.oristool.rospino.computingNodes.Node;
-import org.oristool.rospino.computingNodes.WeightedGraph;
+import org.oristool.rospino.computingNodes.StronglyConnectedWeightedGraph;
 import org.oristool.rospino.placement.DeploymentManager;
+import org.oristool.rospino.placement.DeploymentPlan;
 import org.oristool.rospino.placement.Service;
 
-import java.util.*;
+import java.util.List;
 
 import static org.oristool.models.stpn.trees.StochasticTransitionFeature.newUniformInstance;
 
 public class Main {
+
     public static void main(String[] args) {
         // Rete: 2 nodi, ciascuno con 4 core
         Node n1 = new Node(1, 4);
         Node n2 = new Node(2, 4);
         Node n3 = new Node(3, 4);
 
-        WeightedGraph<Node, Delay> weightedGraph = new WeightedGraph<>();
-        weightedGraph.addNode(n1,new Delay(0,0));
-        weightedGraph.addNode(n2,new Delay(0,0));
-        weightedGraph.addNode(n3,new Delay(0,0));
-        weightedGraph.addEdge(n1, n2, new Delay(1,5));
-        weightedGraph.addEdge(n1, n3, new Delay(1,5));
-        weightedGraph.addEdge(n2, n3, new Delay(1,5));
+        StronglyConnectedWeightedGraph<Node, Delay> stronglyConnectedWeightedGraph = new StronglyConnectedWeightedGraph<>();
+        stronglyConnectedWeightedGraph.addNode(n1,new Delay(0,0));
+        stronglyConnectedWeightedGraph.addNode(n2,new Delay(0,0));
+        stronglyConnectedWeightedGraph.addNode(n3,new Delay(0,0));
+        stronglyConnectedWeightedGraph.addEdge(n1, n2, new Delay(1,5));
+        stronglyConnectedWeightedGraph.addEdge(n1, n3, new Delay(1,5));
+        stronglyConnectedWeightedGraph.addEdge(n2, n3, new Delay(1,5));
+        NetworkGraph networkGraph = new NetworkGraph(stronglyConnectedWeightedGraph);
 
         // Servizi: id, jobSize, ioTime, demand
 
-        StochasticTransitionFeature feature = newUniformInstance( "0" , "1" ) ;;
+        StochasticTransitionFeature feature = newUniformInstance( "0" , "1" ) ;
 
         Activity Q = DAG. sequence ( "Q" ,
                 DAG.forkJoin( "Q1" ,
@@ -103,17 +107,13 @@ public class Main {
         List<Service> services = List.of(sA, sB, sC);
 
 
-        DeploymentManager planner = new DeploymentManager(weightedGraph);
+        DeploymentManager planner = DeploymentManager.getInstance();
         // DAG: A → B → C
         sB.addPredecessors(sA);
         sC.addPredecessors(sB);
 
-        Map<Service, Node> result = planner.place(services);
-        result.forEach((svc, node) ->
-                System.out.println("Servizio " + svc + " → " + node.getId()));
-
-        System.out.printf("Costo totale: %.2f%n", planner.totalCost(services));
+        DeploymentPlan plan = planner.place(networkGraph, services);
+        System.out.print(plan.toString());
+        System.out.printf("Costo totale: %.2f%n%n", plan.totalCost());
     }
 }
-
-

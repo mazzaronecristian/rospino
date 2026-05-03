@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.oristool.rospino.computingNodes.WeightedGraph;
+import org.oristool.rospino.computingNodes.StronglyConnectedWeightedGraph;
 
 import java.util.*;
 
@@ -26,17 +26,17 @@ import static org.junit.jupiter.api.Assertions.*;
  *   </dependency>
  */
 @DisplayName("WeightedGraph")
-class WeightedGraphTest {
+class StronglyConnectedWeightedGraphTest {
 
     // =========================================================================
     // Fixture
     // =========================================================================
 
-    private WeightedGraph<String, Double> g;
+    private StronglyConnectedWeightedGraph<String, Double> g;
 
     @BeforeEach
     void setUp() {
-        g = new WeightedGraph<>();
+        g = new StronglyConnectedWeightedGraph<>();
     }
 
     /** Grafo triangolo A-B-C riutilizzato in più suite. */
@@ -131,7 +131,7 @@ class WeightedGraphTest {
         @Test
         @DisplayName("addNode con tipo Integer")
         void addNodeWithIntegerType() {
-            WeightedGraph<Integer, Double> gi = new WeightedGraph<>();
+            StronglyConnectedWeightedGraph<Integer, Double> gi = new StronglyConnectedWeightedGraph<>();
             gi.addNode(42);
             assertTrue(gi.hasNode(42));
         }
@@ -276,7 +276,7 @@ class WeightedGraphTest {
         @DisplayName("edges() non contiene duplicati")
         void edgesNoDuplicates() {
             buildTriangle();
-            List<WeightedGraph.Edge<String, Double>> edgeList = g.edges();
+            List<StronglyConnectedWeightedGraph.Edge<String, Double>> edgeList = g.edges();
             assertEquals(3, edgeList.size());
         }
 
@@ -284,7 +284,7 @@ class WeightedGraphTest {
         @DisplayName("neighbors() è non modificabile")
         void neighborsUnmodifiable() {
             g.addEdge("A", "B", 1.0);
-            List<WeightedGraph.Edge<String, Double>> nb = g.neighbors("A");
+            List<StronglyConnectedWeightedGraph.Edge<String, Double>> nb = g.neighbors("A");
             assertThrows(UnsupportedOperationException.class,
                     () -> nb.remove(0));
         }
@@ -494,7 +494,7 @@ class WeightedGraphTest {
         @Test
         @DisplayName("Grafo con tipo Integer funziona correttamente")
         void integerNodeType() {
-            WeightedGraph<Integer, Double> gi = new WeightedGraph<>();
+            StronglyConnectedWeightedGraph<Integer, Double> gi = new StronglyConnectedWeightedGraph<>();
             gi.addEdge(1, 2, 10.0);
             gi.addEdge(2, 3, 20.0);
             assertTrue(gi.hasEdge(1, 2));
