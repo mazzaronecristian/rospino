@@ -52,7 +52,7 @@ class StronglyConnectedWeightedGraphTest {
 
     @Nested
     @DisplayName("Gestione nodi")
-    class NodeTests {
+    class RospinoNodeTests {
 
         @Test
         @DisplayName("Grafo vuoto non contiene nodi")
