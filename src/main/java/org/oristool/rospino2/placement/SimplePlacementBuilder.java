@@ -12,7 +12,7 @@ import java.util.*;
 public class SimplePlacementBuilder extends PlacementBuilder{
     @Override
     public Placement build() {
-        Map<Activity, AbstractNode> assignments = new HashMap<>();
+        Map<Activity, AbstractNode> assignments = new LinkedHashMap<>();
         List<Activity> sortedActivities = topologicalSort(this.getWorkflow().activities());
         NetworkGraph networkGraph = this.getNetworkGraph();
         for (Activity activity : sortedActivities) {
@@ -53,10 +53,15 @@ public class SimplePlacementBuilder extends PlacementBuilder{
         return cost;
     }
 
+    /**
+     * Restituisce la lista di {@code Activity} passata, riordinata in modo topologico, badandosi sui predecessori di ogni activity
+     *
+     * @param activities
+     * @return
+     */
     private List<Activity> topologicalSort(List<Activity> activities) {
 
         Map<Activity, Integer> inDegree = new HashMap<>();
-//?        for (Activity activity : activities) inDegree.put(activity, 0);
         for (Activity activity : activities) {
             int numOfPredecessors = activity.pre().size();
             inDegree.put(activity, numOfPredecessors);

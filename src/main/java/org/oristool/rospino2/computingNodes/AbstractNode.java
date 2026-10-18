@@ -47,7 +47,10 @@ public abstract class AbstractNode {
 
     @Override
     public boolean equals(Object obj) {
-        if(!(obj instanceof RospinoNode other)){
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof AbstractNode other)) {
             return false;
         }
         return other.getId() == this.id;
