@@ -8,6 +8,7 @@ import org.oristool.eulero.modeling.stochastictime.StochasticTime;
 import org.oristool.eulero.modeling.stochastictime.UniformTime;
 import org.oristool.rospino2.computingNodes.AbstractNode;
 import org.oristool.rospino2.computingNodes.NetworkGraph;
+import org.oristool.rospino2.computingNodes.RospinoNode;
 import org.oristool.rospino2.computingNodes.StronglyConnectedWeightedGraph;
 
 import java.util.LinkedHashMap;
@@ -182,7 +183,7 @@ class PlacementTest {
     }
 
     private static AbstractNode node(int id) {
-        return new Rospino2Node(id, 4);
+        return new RospinoNode(id, 4);
     }
 
     private static Simple task(String name) {
