@@ -5,7 +5,7 @@ import org.oristool.rospino2.computingNodes.NetworkGraph;
 
 public abstract class PlacementBuilder {
     private NetworkGraph networkGraph;
-    private Activity workflow;
+    private Service workflow;
 
 
     public NetworkGraph getNetworkGraph() {
@@ -17,11 +17,11 @@ public abstract class PlacementBuilder {
         return this;
     }
 
-    public Activity getWorkflow() {
+    public Service getWorkflow() {
         return workflow;
     }
 
-    public PlacementBuilder setWorkflow(Activity workflow) {
+    public PlacementBuilder setWorkflow(Service workflow) {
         this.workflow = workflow;
         return this;
     }

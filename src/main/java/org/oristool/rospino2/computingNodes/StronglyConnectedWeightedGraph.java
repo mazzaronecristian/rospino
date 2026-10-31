@@ -274,22 +274,13 @@ public class StronglyConnectedWeightedGraph<N, K> {
     // -------------------------------------------------------------------------
 
     /**
-     * Rappresenta un arco pesato tra due nodi.
-     */
-    public static class Edge<T, K> {
-        public final T from;
-        public final T to;
-        public final K weight;
-
-        public Edge(T from, T to, K weight) {
-            this.from = from;
-            this.to = to;
-            this.weight = weight;
-        }
+         * Rappresenta un arco pesato tra due nodi.
+         */
+        public record Edge<T, K>(T from, T to, K weight) {
 
         @Override
-        public String toString() {
-            return from + " --[" + weight + "]--> " + to;
+            public String toString() {
+                return from + " --[" + weight + "]--> " + to;
+            }
         }
-    }
 }

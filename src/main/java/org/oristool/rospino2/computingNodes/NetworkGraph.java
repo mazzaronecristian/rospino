@@ -3,21 +3,20 @@ package org.oristool.rospino2.computingNodes;
 import org.oristool.eulero.modeling.stochastictime.StochasticTime;
 import org.oristool.eulero.modeling.stochastictime.UniformTime;
 
-import javax.swing.*;
 import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.Set;
 
 public class NetworkGraph {
-    private final StronglyConnectedWeightedGraph<AbstractNode, StochasticTime> adjMatrix;
+    private final BidirectionalWeightedGraph<AbstractNode> adjMatrix;
     private final Set<AbstractNode> rospinoNodes;
 
-    public NetworkGraph(StronglyConnectedWeightedGraph<AbstractNode, StochasticTime> graph) {
+    public NetworkGraph(BidirectionalWeightedGraph<AbstractNode> graph) {
         this.adjMatrix = graph;
-        this.rospinoNodes = graph.keySet();
+        this.rospinoNodes = graph.nodes();
     }
 
-    public StronglyConnectedWeightedGraph<AbstractNode, StochasticTime> getAdjMatrix() {
+    public BidirectionalWeightedGraph<AbstractNode> getAdjMatrix() {
         return adjMatrix;
     }
 

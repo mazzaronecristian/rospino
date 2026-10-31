@@ -1,7 +1,5 @@
 package org.oristool.rospino2.computingNodes;
 
-import org.oristool.eulero.modeling.Activity;
-
 public abstract class AbstractNode {
     private int id;
     private double totalCores;
@@ -41,9 +39,9 @@ public abstract class AbstractNode {
     }
 
 
-    public abstract boolean canHost(Activity a);
+    public abstract boolean canHost(Integer demand);
 
-    public abstract void allocate(Activity a);
+    public abstract void allocate(Integer demand);
 
     @Override
     public boolean equals(Object obj) {
